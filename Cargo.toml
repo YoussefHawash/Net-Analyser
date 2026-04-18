@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 comfy-table = "7.2.2"
+crossterm = "0.29.0"

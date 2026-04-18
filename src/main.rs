@@ -2,10 +2,43 @@ use comfy_table::Table;
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use std::collections::HashMap;
 use std::fs;
-use std::io;
+use std::io::{self, Write};
 use std::thread;
 use std::time::Duration;
 
+use crossterm::{
+    cursor::MoveTo,
+    execute,
+    style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
+    terminal::{Clear, ClearType, size},
+};
+
+fn draw_bottom_status(line: &str) -> io::Result<()> {
+    let (cols, rows) = size()?;
+    let bottom_row = rows.saturating_sub(1);
+
+    // Trim if too long for terminal width
+    let mut text = line.to_string();
+    if text.len() > cols as usize {
+        text.truncate(cols as usize);
+    }
+
+    let stdout = io::stdout();
+    let mut out = stdout.lock();
+
+    execute!(
+        out,
+        MoveTo(0, bottom_row),
+        Clear(ClearType::CurrentLine),
+        SetBackgroundColor(Color::White),
+        SetForegroundColor(Color::Black),
+        Print(format!("{:<width$}", text, width = cols as usize)),
+        ResetColor
+    )?;
+
+    out.flush()?;
+    Ok(())
+}
 const REFRESH_INTERVAL: u64 = 1; // seconds
 const EXPOSED_FILES: [(&str, &str); 2] = [("/proc/net/tcp", "tcp"), ("/proc/net/udp", "udp")];
 struct ConnectionInfo {
@@ -253,10 +286,10 @@ fn main() -> io::Result<()> {
         match list_packets() {
             Ok(stats) => {
                 for s in stats.iter() {
-                    println!(
-                        "{}: RX {} bytes ({} packets), TX {} bytes ({} packets)",
+                    draw_bottom_status(&format!(
+                        "{} - RX: {} bytes ({} packets), TX: {} bytes ({} packets)",
                         s.interface, s.rx_bytes, s.rx_packets, s.tx_bytes, s.tx_packets
-                    );
+                    ))?;
                 }
             }
             Err(e) => {
