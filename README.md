@@ -1,4 +1,4 @@
-Rust Network Monitor (Process + Interface Stats)
+<img width="1495" height="854" alt="image" src="https://github.com/user-attachments/assets/dc864087-6fcb-4321-8968-f713fc9e7454" />Rust Network Monitor (Process + Interface Stats)
 
 A lightweight Linux CLI tool written in Rust that:
 
@@ -7,7 +7,7 @@ A lightweight Linux CLI tool written in Rust that:
 - Shows live RX/TX stats per interface in a bottom status bar
 
 No external system libraries — everything is read directly from /proc.
-
+![Example](https://drive.google.com/file/d/1Flowo94EA6cBEeNH5lxQfkh2YnIeCK-9/view?usp=sharing) 
 ---
 
 Features
