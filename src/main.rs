@@ -283,6 +283,7 @@ fn main() -> io::Result<()> {
             }
         }
         println!("\n=== Network Interface Stats ===");
+
         match list_packets() {
             Ok(stats) => {
                 for s in stats.iter() {
@@ -297,10 +298,6 @@ fn main() -> io::Result<()> {
             }
         }
 
-        println!(
-            "\nRefreshing every {} seconds... Press Ctrl+C to stop.",
-            REFRESH_INTERVAL
-        );
         thread::sleep(Duration::from_secs(REFRESH_INTERVAL));
     }
 }
