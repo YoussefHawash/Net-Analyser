@@ -18,6 +18,13 @@ struct ConnectionInfo {
     remote_port: u16,
     state: String,
 }
+struct InterfaceStats {
+    interface: String,
+    rx_bytes: u64,
+    rx_packets: u64,
+    tx_bytes: u64,
+    tx_packets: u64,
+}
 struct Socket {
     proto: String,
     local_addr: String,
@@ -167,6 +174,55 @@ fn list_connections() -> io::Result<Vec<ConnectionInfo>> {
 fn clear_screen() {
     print!("\x1B[2J\x1B[1;1H");
 }
+fn list_packets() -> io::Result<Vec<InterfaceStats>> {
+    let content = fs::read_to_string("/proc/net/dev")?;
+    let mut stats = Vec::new();
+
+    for line in content.lines().skip(2) {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+
+        // Example format:
+        // eth0: 12345 67 0 0 0 0 0 0 54321 76 0 0 0 0 0 0
+        let mut parts = line.split(':');
+        let iface = match parts.next() {
+            Some(v) => v.trim().to_string(),
+            None => continue,
+        };
+
+        let data = match parts.next() {
+            Some(v) => v,
+            None => continue,
+        };
+
+        let cols: Vec<&str> = data.split_whitespace().collect();
+
+        // /proc/net/dev gives RX fields first, then TX fields.
+        // We only need:
+        // RX: bytes[0], packets[1]
+        // TX: bytes[8], packets[9]
+        if cols.len() < 10 {
+            continue;
+        }
+
+        let rx_bytes = cols[0].parse::<u64>().unwrap_or(0);
+        let rx_packets = cols[1].parse::<u64>().unwrap_or(0);
+        let tx_bytes = cols[8].parse::<u64>().unwrap_or(0);
+        let tx_packets = cols[9].parse::<u64>().unwrap_or(0);
+
+        stats.push(InterfaceStats {
+            interface: iface,
+            rx_bytes,
+            rx_packets,
+            tx_bytes,
+            tx_packets,
+        });
+    }
+
+    Ok(stats)
+}
 fn main() -> io::Result<()> {
     loop {
         let mut table = Table::new();
@@ -191,6 +247,20 @@ fn main() -> io::Result<()> {
             }
             Err(e) => {
                 eprintln!("Failed to read process connections: {}", e);
+            }
+        }
+        println!("\n=== Network Interface Stats ===");
+        match list_packets() {
+            Ok(stats) => {
+                for s in stats.iter() {
+                    println!(
+                        "{}: RX {} bytes ({} packets), TX {} bytes ({} packets)",
+                        s.interface, s.rx_bytes, s.rx_packets, s.tx_bytes, s.tx_packets
+                    );
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to read network stats: {}", e);
             }
         }
 
