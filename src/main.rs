@@ -282,8 +282,6 @@ fn main() -> io::Result<()> {
                 eprintln!("Failed to read process connections: {}", e);
             }
         }
-        println!("\n=== Network Interface Stats ===");
-
         match list_packets() {
             Ok(stats) => {
                 for s in stats.iter() {
