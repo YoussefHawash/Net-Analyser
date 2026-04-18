@@ -217,8 +217,6 @@ fn list_packets() -> io::Result<Vec<InterfaceStats>> {
             continue;
         }
 
-        // Example format:
-        // eth0: 12345 67 0 0 0 0 0 0 54321 76 0 0 0 0 0 0
         let mut parts = line.split(':');
         let iface = match parts.next() {
             Some(v) => v.trim().to_string(),
@@ -232,10 +230,6 @@ fn list_packets() -> io::Result<Vec<InterfaceStats>> {
 
         let cols: Vec<&str> = data.split_whitespace().collect();
 
-        // /proc/net/dev gives RX fields first, then TX fields.
-        // We only need:
-        // RX: bytes[0], packets[1]
-        // TX: bytes[8], packets[9]
         if cols.len() < 10 {
             continue;
         }
