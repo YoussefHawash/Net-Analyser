@@ -7,7 +7,8 @@ A lightweight Linux CLI tool written in Rust that:
 - Shows live RX/TX stats per interface in a bottom status bar
 
 No external system libraries — everything is read directly from /proc.
-![Example](https://drive.google.com/file/d/1Flowo94EA6cBEeNH5lxQfkh2YnIeCK-9/view?usp=sharing) 
+![Example](https://drive.google.com/file/d/1Flowo94EA6cBEeNH5lxQfkh2YnIeCK-9/view?usp=sharing)
+
 ---
 
 Features
@@ -110,3 +111,43 @@ Possible Improvements
 - IPv6 support
 - Filtering/ Sorting / paging
 - Better UI (tabs, scrolling)
+
+## ✅ System Requirements Checklist
+
+### 🔹 Functional Requirements
+
+- [x] Monitor network traffic in real time
+- [x] Display active connections (IP, port, protocol, bandwidth)
+- [x] Map traffic to processes (PID) and users
+- [ ] Provide a GUI dashboard for visualization
+- [ ] Support filtering and sorting (process, user, protocol, usage)
+- [ ] Show top bandwidth-consuming processes
+- [ ] Generate alerts for abnormal activity
+- [ ] Store traffic data for later analysis
+
+### 🔹 Non-Functional Requirements
+
+#### ⚡ Performance
+
+- [ ] Display updates within 500 ms
+- [ ] Handle packet capture with <1% loss at moderate traffic
+- [ ] Maintain CPU usage below 15% during normal operation
+
+#### 📈 Scalability
+
+- [ ] Efficiently monitor 100–500 simultaneous connections
+
+#### 🛡️ Reliability
+
+- [ ] Handle malformed packets and traffic spikes
+- [ ] Remain stable under continuous monitoring
+
+#### 🔐 Security
+
+- [ ] Require minimal privilege escalation
+- [ ] Ensure read-only packet handling
+
+#### 🎯 Usability
+
+- [ ] Provide intuitive GUI and CLI interfaces
+- [ ] Support easy filtering and navigation
