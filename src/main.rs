@@ -264,8 +264,11 @@ fn list_connections() -> io::Result<Vec<ConnectionInfo>> {
     Ok(connections)
 }
 
-fn clear_screen() {
-    print!("\x1B[2J\x1B[1;1H");
+fn clear_screen() -> io::Result<()> {
+    let mut out = io::stdout();
+    execute!(out, Clear(ClearType::All), MoveTo(0, 0))?;
+    out.flush()?;
+    Ok(())
 }
 
 fn list_packets() -> io::Result<Vec<InterfaceStats>> {
@@ -376,7 +379,7 @@ fn main() -> io::Result<()> {
             ])
             .apply_modifier(UTF8_ROUND_CORNERS);
 
-        clear_screen();
+        clear_screen()?;
         println!("=== Process Network Connections ===");
 
         match list_connections() {
@@ -404,7 +407,7 @@ fn main() -> io::Result<()> {
                 let bandwidth_lines =
                     compute_bandwidth(&previous_stats, &stats, REFRESH_INTERVAL.max(1));
 
-                if let Some(first_line) = bandwidth_lines.first() {
+                if let Some(first_line) = bandwidth_lines.last() {
                     draw_bottom_status(first_line)?;
                 }
 
